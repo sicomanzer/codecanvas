@@ -148,13 +148,13 @@ export function ShareDialog({
           ? "medium"
           : "short";
   const sizeNote: Record<typeof size, string> = {
-    short: "this one is short and should work anywhere.",
+    short: "This link is short and should work anywhere.",
     medium:
-      "this one is medium length — it works in browsers and most chat apps, but a few tools may wrap it.",
+      "At this size the link is medium length: it works in browsers and most chat apps, though a few tools may wrap it.",
     large:
-      "this one is long, so some chat apps may break the link. Downloading the HTML file is more reliable.",
+      "This link is long, so some chat apps may break it. Downloading the HTML file is more reliable.",
     "too-large":
-      "this one is very long and may not work in every app. Download the HTML file instead for a safer copy.",
+      "This link is very long and may not work in every app. Download the HTML file instead for a safer copy.",
   };
 
   return (
@@ -203,8 +203,7 @@ export function ShareDialog({
         <Share2 size={15} style={{ flex: "0 0 auto", marginTop: 1 }} />
         <span>
           Anyone with this link can open a copy of the code. Changes they make
-          stay on their device. Very large projects make long links —{" "}
-          {sizeNote[size]}
+          stay on their device. {sizeNote[size]}
         </span>
       </div>
 
