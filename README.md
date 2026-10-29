@@ -2,7 +2,7 @@
 
 A fast, browser-based HTML / CSS / JavaScript playground with live preview, a real console, starter templates and shareable links. Built with Next.js 15, React 19, TypeScript, Tailwind CSS v4 and CodeMirror 6.
 
-**Live demo:** https://codecanvas-html.vercel.app _(update this line after deploying)_
+**Live demo:** https://htmlonline.vercel.app
 
 ## Features
 
