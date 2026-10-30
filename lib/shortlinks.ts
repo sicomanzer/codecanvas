@@ -1,7 +1,8 @@
 import { createHash } from "node:crypto";
 import { cache } from "react";
-import { head, put } from "@vercel/blob";
+import { del, head, list, put } from "@vercel/blob";
 import { decodePayload } from "./share";
+import type { StoredShortLink } from "./shortlinks.types";
 import type { Project } from "./types";
 
 const PREFIX = "links/";
@@ -47,12 +48,10 @@ export async function createShortLink(payload: string): Promise<string> {
   return id;
 }
 
-export async function readShortPayload(id: string): Promise<string | null> {
-  if (!isShortId(id)) return null;
+async function fetchPayload(url: string): Promise<string | null> {
   try {
-    const meta = await head(blobPath(id));
     const load = async () => {
-      const response = await fetch(meta.url, { cache: "no-store" });
+      const response = await fetch(url, { cache: "no-store" });
       return response.ok ? response : null;
     };
 
@@ -71,6 +70,16 @@ export async function readShortPayload(id: string): Promise<string | null> {
   }
 }
 
+export async function readShortPayload(id: string): Promise<string | null> {
+  if (!isShortId(id)) return null;
+  try {
+    const meta = await head(blobPath(id));
+    return await fetchPayload(meta.url);
+  } catch {
+    return null;
+  }
+}
+
 /** One lookup per request even when metadata and the page both need it. */
 export const loadShortProject = cache(
   async (id: string): Promise<Project | null> => {
@@ -79,3 +88,45 @@ export const loadShortProject = cache(
     return decodePayload(payload);
   },
 );
+
+const SUMMARY_LIMIT = 100;
+
+/** Newest first. Reads each payload so the management page can show names. */
+export async function listShortLinks(): Promise<StoredShortLink[]> {
+  const { blobs } = await list({ prefix: PREFIX, limit: 500 });
+
+  const recent = blobs
+    .slice()
+    .sort(
+      (left, right) =>
+        new Date(right.uploadedAt).getTime() -
+        new Date(left.uploadedAt).getTime(),
+    )
+    .slice(0, SUMMARY_LIMIT);
+
+  const items = await Promise.all(
+    recent.map(async (blob) => {
+      const id = blob.pathname.slice(PREFIX.length).replace(/\.json$/, "");
+      const payload = await fetchPayload(blob.url);
+      const project = payload ? decodePayload(payload) : null;
+      return {
+        id,
+        name: project?.name ?? "Untitled project",
+        size: blob.size,
+        createdAt: new Date(blob.uploadedAt).getTime(),
+      } satisfies StoredShortLink;
+    }),
+  );
+
+  return items;
+}
+
+export async function deleteShortLink(id: string): Promise<boolean> {
+  if (!isShortId(id)) return false;
+  try {
+    await del(blobPath(id));
+    return true;
+  } catch {
+    return false;
+  }
+}
