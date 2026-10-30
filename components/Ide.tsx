@@ -55,6 +55,7 @@ import {
   saveSession,
 } from "@/lib/storage";
 import {
+  buildShareUrl,
   clearShareFromLocation,
   readShareFromLocation,
   writeShareToLocation,
@@ -119,6 +120,8 @@ export function Ide() {
   const [saveAsMode, setSaveAsMode] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState("");
+  const [previewShareUrl, setPreviewShareUrl] = useState("");
+  const [shareMode, setShareMode] = useState<"editor" | "preview">("editor");
   const [confirm, setConfirm] = useState<ConfirmState | null>(null);
 
   const editorRef = useRef<CodeEditorHandle>(null);
@@ -636,11 +639,16 @@ export function Ide() {
   /* ---------------------------------------------------------------------- */
   /* Share / download / copy / import                                        */
   /* ---------------------------------------------------------------------- */
-  const openShare = useCallback(() => {
-    const url = writeShareToLocation(project);
-    setShareUrl(url);
-    setShareOpen(true);
-  }, [project]);
+  const openShare = useCallback(
+    (mode: "editor" | "preview" = "editor") => {
+      const url = writeShareToLocation(project);
+      setShareUrl(url);
+      setPreviewShareUrl(buildShareUrl(project, "preview"));
+      setShareMode(mode);
+      setShareOpen(true);
+    },
+    [project],
+  );
 
   const downloadHtml = useCallback(() => {
     const html = buildExportDocument(project);
@@ -893,7 +901,7 @@ export function Ide() {
         onRun={() => run()}
         onSave={quickSave}
         onSaveAs={() => openSaveDialog(true)}
-        onShare={openShare}
+        onShare={() => openShare("editor")}
         onNew={confirmStartNew}
         onOpenFiles={openFilesDialog}
         onOpenTemplates={openTemplatesDialog}
@@ -1114,6 +1122,7 @@ export function Ide() {
           onLog={handleLog}
           onReady={handleReady}
           onRefresh={() => run()}
+          onSharePreview={() => openShare("preview")}
         />
       </div>
 
@@ -1138,6 +1147,8 @@ export function Ide() {
         open={shareOpen}
         onClose={() => setShareOpen(false)}
         url={shareUrl}
+        previewUrl={previewShareUrl}
+        initialMode={shareMode}
       />
 
       <FilesDialog

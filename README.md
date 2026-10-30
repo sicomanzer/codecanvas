@@ -13,7 +13,7 @@ A fast, browser-based HTML / CSS / JavaScript playground with live preview, a re
 - **Starter templates** — landing page, dashboard, todo app, canvas animation, form and a 404 page.
 - **Import** — split a standalone HTML file into editable HTML, CSS and JS files.
 - **Autosave** — the current project is restored from `localStorage`; named copies live in **Saved playgrounds**.
-- **Share by link** — the whole project is LZ-compressed into the URL fragment. No backend, database or account required.
+- **Share by link** — send an editable project link, or a **preview-only link** that opens the rendered page full screen without the editor UI. The whole project is LZ-compressed into the URL fragment, so no backend, database or account is required.
 - **Download** — export a single self-contained `.html` file with CSS and JS inlined.
 - **Formatting** — Prettier for HTML, CSS, JS, JSON and Markdown.
 - **Themes and settings** — dark/light themes, font size, tab size, word wrap, auto-run and keyboard shortcuts.
@@ -43,10 +43,12 @@ Open <http://localhost:3000>.
 
 ```
 app/                  Next.js App Router pages, metadata, manifest, robots, sitemap
+app/preview/          Full-screen preview-only share route
 components/
   Ide.tsx             Main client app: state, autosave, run, files, share, splitter
   CodeEditor.tsx      CodeMirror 6 setup, themes and language compartments
   Preview.tsx         Sandboxed iframe, viewport toggles and console UI
+  PreviewShare.tsx    Preview-only share page and invalid-link handling
   TopBar.tsx          Top navigation and primary actions
   dialogs.tsx         Save, share, files, library, templates, settings, shortcuts
   SiteHeader.tsx      Header for documentation pages
@@ -62,7 +64,12 @@ app/globals.css       Design tokens, layout and responsive styles
 
 ## How sharing works
 
-A share link stores the compressed project in the URL **fragment** (`#p=...`). Fragments are never sent to the server, so there is no storage cost and no privacy leak to the host. Anyone who opens the link gets an editable copy.
+A share link stores the compressed project in the URL **fragment** (`#p=...`). Fragments are never sent to the server, so there is no storage cost and no privacy leak to the host.
+
+The share dialog offers two link types:
+
+- **Editor link** (`/#p=...`) — opens the project in CodeCanvas with every file, ready to edit.
+- **Preview only** (`/preview#p=...`) — renders the entry HTML full screen without the editor UI. The project data is still in the link, so it is a presentation view rather than a secret. The preview toolbar also has a dedicated share button for this mode.
 
 Trade-offs:
 

@@ -6,6 +6,7 @@ import {
   ExternalLink,
   Monitor,
   RotateCw,
+  Share2,
   Smartphone,
   Tablet,
   TerminalSquare,
@@ -26,6 +27,7 @@ interface PreviewProps {
   onLog: (entry: Omit<ConsoleEntry, "id">) => void;
   onReady: () => void;
   onRefresh: () => void;
+  onSharePreview: () => void;
 }
 
 const DEVICES: Array<{ id: PreviewDevice; label: string; icon: typeof Monitor }> = [
@@ -46,6 +48,7 @@ export function Preview({
   onLog,
   onReady,
   onRefresh,
+  onSharePreview,
 }: PreviewProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const consoleRef = useRef<HTMLDivElement>(null);
@@ -154,6 +157,15 @@ export function Preview({
           aria-label="Open preview in a new tab"
         >
           <ExternalLink size={14} />
+        </button>
+        <button
+          type="button"
+          className="icon-btn"
+          onClick={onSharePreview}
+          title="Create a preview-only link"
+          aria-label="Create a preview-only link"
+        >
+          <Share2 size={14} />
         </button>
       </div>
 

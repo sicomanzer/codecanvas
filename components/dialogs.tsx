@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Check,
+  Code2,
   Copy,
   ExternalLink,
+  Eye,
   FilePlus2,
   Pencil,
   Plus,
@@ -100,27 +102,40 @@ export function ShareDialog({
   open,
   onClose,
   url,
+  previewUrl,
+  initialMode = "editor",
 }: {
   open: boolean;
   onClose: () => void;
   url: string;
+  previewUrl: string;
+  initialMode?: "editor" | "preview";
 }) {
+  const [mode, setMode] = useState<"editor" | "preview">(initialMode);
   const [copied, setCopied] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (!open) setCopied(false);
-  }, [open]);
+  const activeUrl = mode === "preview" ? previewUrl : url;
 
   useEffect(() => {
     if (open) {
-      window.setTimeout(() => inputRef.current?.select(), 80);
+      setMode(initialMode);
+      setCopied(false);
     }
-  }, [open, url]);
+  }, [open, initialMode]);
+
+  useEffect(() => {
+    setCopied(false);
+  }, [mode]);
+
+  useEffect(() => {
+    if (!open) return;
+    const timer = window.setTimeout(() => inputRef.current?.select(), 80);
+    return () => window.clearTimeout(timer);
+  }, [open, activeUrl]);
 
   const copy = async () => {
     try {
-      await copyText(url);
+      await copyText(activeUrl);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2200);
     } catch {
@@ -131,14 +146,20 @@ export function ShareDialog({
   const nativeShare = async () => {
     try {
       if (navigator.share) {
-        await navigator.share({ title: "CodeCanvas playground", url });
+        await navigator.share({
+          title:
+            mode === "preview"
+              ? "CodeCanvas preview"
+              : "CodeCanvas playground",
+          url: activeUrl,
+        });
       }
     } catch {
       /* user dismissed */
     }
   };
 
-  const length = url.length;
+  const length = activeUrl.length;
   const size =
     length > 30_000
       ? "too-large"
@@ -162,7 +183,11 @@ export function ShareDialog({
       open={open}
       onClose={onClose}
       title="Share this playground"
-      description="The full project is compressed into the link — no account or server needed."
+      description={
+        mode === "preview"
+          ? "Send a clean, full-screen preview. The CodeCanvas editor is not shown."
+          : "The full project is compressed into the link — no account or server needed."
+      }
       footer={
         <>
           <span className="left">
@@ -170,7 +195,7 @@ export function ShareDialog({
           </span>
           <a
             className="btn"
-            href={url}
+            href={activeUrl}
             target="_blank"
             rel="noreferrer"
             style={{ textDecoration: "none" }}
@@ -185,15 +210,47 @@ export function ShareDialog({
         </>
       }
     >
+      <div className="share-mode">
+        <span className="share-mode-label">Link type</span>
+        <div className="segmented" role="group" aria-label="Link type">
+          <button
+            type="button"
+            className={mode === "editor" ? "is-active" : undefined}
+            onClick={() => setMode("editor")}
+            aria-pressed={mode === "editor"}
+          >
+            <Code2 size={12} />
+            Editor
+          </button>
+          <button
+            type="button"
+            className={mode === "preview" ? "is-active" : undefined}
+            onClick={() => setMode("preview")}
+            aria-pressed={mode === "preview"}
+          >
+            <Eye size={12} />
+            Preview only
+          </button>
+        </div>
+      </div>
+
+      <p className="share-mode-hint">
+        {mode === "preview"
+          ? "Recipients see the rendered page in full screen. The editor is hidden, but the project data is still inside the link."
+          : "Recipients open the project in CodeCanvas with every file, ready to edit their own copy."}
+      </p>
+
       <div className="field">
-        <label htmlFor="share-url">Shareable link</label>
+        <label htmlFor="share-url">
+          {mode === "preview" ? "Preview-only link" : "Editable project link"}
+        </label>
         <div className="code-field">
           <input
             id="share-url"
             ref={inputRef}
             className="input"
             readOnly
-            value={url}
+            value={activeUrl}
             onFocus={(event) => event.currentTarget.select()}
           />
         </div>
@@ -202,8 +259,10 @@ export function ShareDialog({
       <div className="share-note">
         <Share2 size={15} style={{ flex: "0 0 auto", marginTop: 1 }} />
         <span>
-          Anyone with this link can open a copy of the code. Changes they make
-          stay on their device. {sizeNote[size]}
+          {mode === "preview"
+            ? "Anyone with this link sees the rendered page only. Later edits are not included until you share a new link. "
+            : "Anyone with this link can open a copy of the code. Changes they make stay on their device. "}
+          {sizeNote[size]}
         </span>
       </div>
 

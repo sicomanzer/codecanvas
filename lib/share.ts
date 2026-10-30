@@ -83,6 +83,15 @@ export function readShareFromLocation(): Project | null {
   return null;
 }
 
+export function buildShareUrl(
+  project: Project,
+  mode: "editor" | "preview" = "editor",
+): string {
+  const encoded = encodeProject(project);
+  const path = mode === "preview" ? "/preview" : window.location.pathname;
+  return `${window.location.origin}${path}${PREFIX}${encoded}`;
+}
+
 export function writeShareToLocation(project: Project): string {
   const encoded = encodeProject(project);
   const url = `${window.location.origin}${window.location.pathname}${PREFIX}${encoded}`;

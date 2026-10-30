@@ -298,10 +298,17 @@ button.addEventListener("click", () => {
           </p>
           <p>
             <strong>Share</strong> compresses the whole project into the URL
-            fragment. No account or server is involved: anyone who opens the link
-            gets an editable copy. Very large projects produce very long URLs,
-            which is why <strong>Download .html</strong> exists — it produces a
-            single self-contained file with CSS and JS inlined.
+            fragment. No account or server is involved. Choose{" "}
+            <strong>Editor</strong> to send an editable copy, or{" "}
+            <strong>Preview only</strong> to send a clean full-screen render
+            without the editor. The project data is still inside the link. Both
+            links are snapshots: later edits are not included until you share
+            again.
+          </p>
+          <p>
+            Very large projects produce very long URLs, which is why{" "}
+            <strong>Download .html</strong> exists — it produces a single
+            self-contained file with CSS and JS inlined.
           </p>
 
           <h2 id="shortcuts">Keyboard shortcuts</h2>

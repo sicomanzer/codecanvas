@@ -986,6 +986,9 @@ html[data-theme="light"] .device-shell[data-device="mobile"] {
   gap: 2px;
 }
 .segmented button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   border: 0;
   background: transparent;
   color: var(--muted);
@@ -1311,6 +1314,82 @@ html[data-theme="light"] .device-shell[data-device="mobile"] {
   color: var(--muted);
   font-size: 11.5px;
   line-height: 1.5;
+}
+.share-mode {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.share-mode-label {
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--ink);
+}
+.share-mode-hint {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+/* Preview-only share page */
+.shared-preview {
+  position: fixed;
+  inset: 0;
+  background: #0b0d13;
+}
+.shared-preview-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #fff;
+}
+.shared-preview-state {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 13px;
+}
+.shared-preview-card {
+  max-width: 440px;
+  padding: 32px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--panel);
+  text-align: center;
+}
+.shared-preview-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 14px;
+  border-radius: 14px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.shared-preview-card h1 {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+.shared-preview-card p {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.shared-preview-card .btn {
+  text-decoration: none;
 }
 
 .shortcut-grid {
