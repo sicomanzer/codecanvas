@@ -24,6 +24,7 @@
     "@codemirror/theme-one-dark": "^6.1.2",
     "@codemirror/view": "^6.36.5",
     "@lezer/highlight": "^1.2.1",
+    "@vercel/blob": "^2.8.2",
     "lucide-react": "^0.511.0",
     "lz-string": "^1.5.0",
     "next": "15.5.28",

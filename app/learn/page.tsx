@@ -297,13 +297,20 @@ button.addEventListener("click", () => {
             per device, so clearing site data removes those copies.
           </p>
           <p>
-            <strong>Share</strong> compresses the whole project into the URL
-            fragment. No account or server is involved. Choose{" "}
-            <strong>Editor</strong> to send an editable copy, or{" "}
-            <strong>Preview only</strong> to send a clean full-screen render
-            without the editor. The project data is still inside the link. Both
-            links are snapshots: later edits are not included until you share
-            again.
+            <strong>Share</strong> creates a short link such as{" "}
+            <code>htmlonline.vercel.app/s/abc123</code>. Choose{" "}
+            <strong>Editor</strong> to
+            send an editable copy, or <strong>Preview only</strong> to send a
+            clean full-screen render without the editor. Short links are stored
+            on the server, so anyone with the link can open them.
+          </p>
+          <p>
+            Prefer everything inside the URL? Switch to{" "}
+            <strong>Use a long link instead</strong>. Long links compress the
+            whole project into the URL fragment, need no server, and the data
+            never reaches the host — but they get long for large projects. Both
+            kinds of link are snapshots: later edits are not included until you
+            share again.
           </p>
           <p>
             Very large projects produce very long URLs, which is why{" "}

@@ -57,6 +57,7 @@ import {
 import {
   buildShareUrl,
   clearShareFromLocation,
+  encodeProject,
   readShareFromLocation,
   writeShareToLocation,
 } from "@/lib/share";
@@ -120,6 +121,7 @@ export function Ide() {
   const [saveAsMode, setSaveAsMode] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [shareUrl, setShareUrl] = useState("");
+  const [sharePayload, setSharePayload] = useState("");
   const [previewShareUrl, setPreviewShareUrl] = useState("");
   const [shareMode, setShareMode] = useState<"editor" | "preview">("editor");
   const [confirm, setConfirm] = useState<ConfirmState | null>(null);
@@ -643,6 +645,7 @@ export function Ide() {
     (mode: "editor" | "preview" = "editor") => {
       const url = writeShareToLocation(project);
       setShareUrl(url);
+      setSharePayload(encodeProject(project));
       setPreviewShareUrl(buildShareUrl(project, "preview"));
       setShareMode(mode);
       setShareOpen(true);
@@ -1148,6 +1151,7 @@ export function Ide() {
         onClose={() => setShareOpen(false)}
         url={shareUrl}
         previewUrl={previewShareUrl}
+        payload={sharePayload}
         initialMode={shareMode}
       />
 

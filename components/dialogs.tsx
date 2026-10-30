@@ -103,18 +103,36 @@ export function ShareDialog({
   onClose,
   url,
   previewUrl,
+  payload,
   initialMode = "editor",
 }: {
   open: boolean;
   onClose: () => void;
   url: string;
   previewUrl: string;
+  payload: string;
   initialMode?: "editor" | "preview";
 }) {
   const [mode, setMode] = useState<"editor" | "preview">(initialMode);
+  const [format, setFormat] = useState<"short" | "long">("short");
+  const [shortId, setShortId] = useState<string | null>(null);
+  const [shortStatus, setShortStatus] = useState<
+    "idle" | "loading" | "ready" | "error"
+  >("idle");
   const [copied, setCopied] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const activeUrl = mode === "preview" ? previewUrl : url;
+  const requestRef = useRef<string | null>(null);
+
+  const origin = url.startsWith("http")
+    ? url.slice(0, url.indexOf("/", url.indexOf("//") + 2))
+    : "";
+
+  const shortUrl = shortId
+    ? `${origin}/s/${shortId}${mode === "editor" ? "/edit" : ""}`
+    : "";
+  const longUrl = mode === "preview" ? previewUrl : url;
+  const activeUrl = format === "short" ? shortUrl : longUrl;
+  const loadingShort = format === "short" && !shortUrl;
 
   useEffect(() => {
     if (open) {
@@ -124,14 +142,56 @@ export function ShareDialog({
   }, [open, initialMode]);
 
   useEffect(() => {
-    setCopied(false);
-  }, [mode]);
+    setShortId(null);
+    setShortStatus("idle");
+    requestRef.current = null;
+  }, [payload]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || format !== "short" || shortId) return;
+    if (requestRef.current === payload) return;
+    requestRef.current = payload;
+
+    let cancelled = false;
+    setShortStatus("loading");
+
+    fetch("/api/links", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ payload }),
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error(`status ${response.status}`);
+        return (await response.json()) as { id?: unknown };
+      })
+      .then((data) => {
+        if (cancelled) return;
+        if (typeof data.id !== "string") throw new Error("missing id");
+        setShortId(data.id);
+        setShortStatus("ready");
+      })
+      .catch(() => {
+        if (cancelled) return;
+        requestRef.current = null;
+        setShortStatus("error");
+        setFormat("long");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, format, payload, shortId]);
+
+  useEffect(() => {
+    setCopied(false);
+  }, [mode, format]);
+
+  useEffect(() => {
+    if (!open || !activeUrl) return;
     const timer = window.setTimeout(() => inputRef.current?.select(), 80);
     return () => window.clearTimeout(timer);
   }, [open, activeUrl]);
+
 
   const copy = async () => {
     try {
@@ -185,25 +245,40 @@ export function ShareDialog({
       title="Share this playground"
       description={
         mode === "preview"
-          ? "Send a clean, full-screen preview. The CodeCanvas editor is not shown."
-          : "The full project is compressed into the link — no account or server needed."
+          ? format === "short"
+            ? "Send a short link that opens the finished page full screen."
+            : "Send a clean, full-screen preview. The CodeCanvas editor is not shown."
+          : format === "short"
+            ? "Send a short link that opens the project in the editor."
+            : "The full project is compressed into the link — no account or server needed."
       }
       footer={
         <>
           <span className="left">
-            {length.toLocaleString()} characters
+            {loadingShort
+              ? "Creating short link…"
+              : `${activeUrl.length.toLocaleString()} characters`}
           </span>
           <a
             className="btn"
-            href={activeUrl}
+            href={activeUrl || undefined}
             target="_blank"
             rel="noreferrer"
             style={{ textDecoration: "none" }}
+            aria-disabled={!activeUrl || undefined}
+            onClick={(event) => {
+              if (!activeUrl) event.preventDefault();
+            }}
           >
             <ExternalLink size={14} />
             Open
           </a>
-          <button type="button" className="btn btn-primary" onClick={copy}>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={copy}
+            disabled={!activeUrl}
+          >
             {copied ? <Check size={14} /> : <Copy size={14} />}
             {copied ? "Copied!" : "Copy link"}
           </button>
@@ -236,33 +311,61 @@ export function ShareDialog({
 
       <p className="share-mode-hint">
         {mode === "preview"
-          ? "Recipients see the rendered page in full screen. The editor is hidden, but the project data is still inside the link."
+          ? "Recipients see the rendered page in full screen. The CodeCanvas editor is not shown."
           : "Recipients open the project in CodeCanvas with every file, ready to edit their own copy."}
       </p>
 
       <div className="field">
         <label htmlFor="share-url">
-          {mode === "preview" ? "Preview-only link" : "Editable project link"}
+          {format === "short"
+            ? mode === "preview"
+              ? "Preview-only short link"
+              : "Editable short link"
+            : mode === "preview"
+              ? "Preview-only link"
+              : "Editable project link"}
         </label>
-        <div className="code-field">
+        <div className={`code-field${loadingShort ? " is-loading" : ""}`}>
           <input
             id="share-url"
             ref={inputRef}
             className="input"
             readOnly
             value={activeUrl}
+            placeholder={loadingShort ? "Creating short link…" : undefined}
             onFocus={(event) => event.currentTarget.select()}
           />
         </div>
+        <button
+          type="button"
+          className="link-btn"
+          onClick={() => setFormat(format === "short" ? "long" : "short")}
+        >
+          {format === "short"
+            ? "Use a long link instead (no server needed)"
+            : "Use a short link instead"}
+        </button>
+        {shortStatus === "error" ? (
+          <p className="share-error">
+            Short links are unavailable right now, so this is a long link. It
+            still works, but it can be very long.
+          </p>
+        ) : null}
       </div>
 
       <div className="share-note">
         <Share2 size={15} style={{ flex: "0 0 auto", marginTop: 1 }} />
         <span>
-          {mode === "preview"
-            ? "Anyone with this link sees the rendered page only. Later edits are not included until you share a new link. "
-            : "Anyone with this link can open a copy of the code. Changes they make stay on their device. "}
-          {sizeNote[size]}
+          {format === "short"
+            ? "The project is saved on CodeCanvas so the link stays short. Anyone with the link can open it; later edits are not included until you share again."
+            : (
+              <>
+                {mode === "preview"
+                  ? "Anyone with this link sees the rendered page only. Later edits are not included until you share a new link. "
+                  : "Anyone with this link can open a copy of the code. Changes they make stay on their device. "}
+                {sizeNote[size]}
+              </>
+            )}
         </span>
       </div>
 
