@@ -96,6 +96,20 @@ Both kinds of link are snapshots. Later edits are not reflected in links that we
 
 > Short links are stored on the hosting provider. Anyone with the link can open it, and the payload is readable by the site operator. Use **Download .html** or long links when the code must stay only in the URL.
 
+### How long do short links last?
+
+Links stay until they are deleted — there is no automatic expiry. They count toward your Vercel Blob storage quota (free tier includes 1 GB).
+
+### View and delete links
+
+Open **จัดการลิงก์ทั้งหมด** from the share dialog, or visit `https://htmlonline.vercel.app/links`. From there you can:
+
+- See every short link you created, its project name, size, and creation time.
+- Open the preview or editor for a link.
+- Delete a link (makes `/s/<id>` and `/s/<id>/edit` stop working).
+
+> There is no login system on this site. Anyone who opens the management page can see and delete **all** links. If you don't want your code stored on the server at all, use **Use a long link instead** — it keeps everything in the URL and needs no storage.
+
 ## Deploying to Vercel
 
 The repository is ready for Vercel with zero configuration.

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
   Check,
@@ -258,6 +259,18 @@ export function ShareDialog({
             {loadingShort
               ? "Creating short link…"
               : `${activeUrl.length.toLocaleString()} characters`}
+            {format === "short" && activeUrl ? (
+              <>
+                {" · "}
+                <Link
+                  href="/links"
+                  className="manage-links"
+                  style={{ textDecoration: "none", marginLeft: 6 }}
+                >
+                  จัดการลิงก์ทั้งหมด
+                </Link>
+              </>
+            ) : null}
           </span>
           <a
             className="btn"

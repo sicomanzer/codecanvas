@@ -1913,4 +1913,11 @@ html[data-theme="light"] .device-shell[data-device="mobile"] {
 .links-nav {
   max-width: 900px;
 }
+.manage-links {
+  color: var(--accent);
+  font-size: 11.5px;
+}
+.manage-links:hover {
+  text-decoration: underline;
+}
 
