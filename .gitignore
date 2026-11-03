@@ -11,3 +11,6 @@ next-env.d.ts
 .data
 
 .vercel
+
+.vercel
+.env*

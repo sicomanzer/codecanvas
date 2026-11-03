@@ -33,13 +33,14 @@ export default async function LinksPage() {
             </Link>
           </div>
           <div className="links-warning">
-            <ShieldAlert size={16} />
-            <strong>คำเตือน:</strong> เว็บไซต์นี้ยังไม่มีระบบล็อกอิน
-            {" "}
-            <strong>ใครก็ตามที่เปิดหน้านี้จะเห็นและลบลิงก์ทั้งหมดได้</strong>
-            หากต้องการความเป็นส่วนตัว ให้ใช้{" "}
-            <strong>Use a long link instead</strong> ซึ่งเก็บทุกอย่างไว้ใน
-            URL แทนที่จะเก็บบนเซิร์ฟเวอร์
+            <ShieldAlert size={16} aria-hidden />
+            <span>
+              <strong>คำเตือน:</strong> เว็บไซต์นี้ยังไม่มีระบบล็อกอิน{" "}
+              <strong>ใครก็ตามที่เปิดหน้านี้จะเห็นและลบลิงก์ทั้งหมดได้</strong>{" "}
+              หากต้องการความเป็นส่วนตัว ให้ใช้{" "}
+              <strong>Use a long link instead</strong> ซึ่งเก็บทุกอย่างไว้ใน
+              URL แทนที่จะเก็บบนเซิร์ฟเวอร์
+            </span>
           </div>
         </nav>
 

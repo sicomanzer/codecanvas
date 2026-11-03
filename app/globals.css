@@ -1799,6 +1799,10 @@ html[data-theme="light"] .device-shell[data-device="mobile"] {
 .links-warning strong {
   color: var(--ink);
 }
+.links-warning > svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
 .links-list-wrap {
   margin-top: 24px;
 }
