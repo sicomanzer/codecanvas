@@ -4,6 +4,7 @@ import {
   MAX_PAYLOAD_LENGTH,
   PAYLOAD_PATTERN,
   createShortLink,
+  isTursoConfigured,
 } from "@/lib/shortlinks";
 
 export const runtime = "nodejs";
@@ -38,6 +39,16 @@ export async function POST(request: Request) {
     return NextResponse.json(
       { error: "The project payload could not be decoded." },
       { status: 400 },
+    );
+  }
+
+  if (!isTursoConfigured()) {
+    return NextResponse.json(
+      {
+        error:
+          "Short links are not configured on this deployment. Set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN.",
+      },
+      { status: 503 },
     );
   }
 

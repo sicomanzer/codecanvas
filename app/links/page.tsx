@@ -1,12 +1,21 @@
 import { List, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { listShortLinks } from "@/lib/shortlinks";
+import type { StoredShortLink } from "@/lib/shortlinks.types";
 import { LinkList } from "@/components/LinkList";
 
 export const dynamic = "force-dynamic";
 
 export default async function LinksPage() {
-  const links = await listShortLinks();
+  let links: StoredShortLink[] = [];
+  let databaseError = false;
+
+  try {
+    links = await listShortLinks();
+  } catch (error) {
+    console.error("[links] could not load short links", error);
+    databaseError = true;
+  }
 
   return (
     <main className="doc-shell">
@@ -35,7 +44,20 @@ export default async function LinksPage() {
         </nav>
 
         <aside className="links-list-wrap">
-          <LinkList links={links} />
+          {databaseError ? (
+            <section className="links-empty">
+              <p>
+                <strong>เชื่อมต่อฐานข้อมูล Turso ไม่ได้</strong>
+              </p>
+              <p className="links-hint">
+                ตั้งค่า <code>TURSO_DATABASE_URL</code> และ{" "}
+                <code>TURSO_AUTH_TOKEN</code> ใน environment แล้วรีสตาร์ทเซิร์ฟเวอร์
+                จากนั้นลิงก์สั้นที่สร้างใหม่จะแสดงที่นี่
+              </p>
+            </section>
+          ) : (
+            <LinkList links={links} />
+          )}
         </aside>
       </section>
     </main>
