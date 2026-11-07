@@ -11,7 +11,7 @@ const ID_LENGTH = 10;
 const LIST_LIMIT = 100;
 
 /** Compressed projects larger than this are rejected to protect the database. */
-export const MAX_PAYLOAD_LENGTH = 180_000;
+export const MAX_PAYLOAD_LENGTH = 1_000_000;
 
 /** LZ-string URI-safe output. */
 export const PAYLOAD_PATTERN = /^[A-Za-z0-9+\-$=]+$/;
